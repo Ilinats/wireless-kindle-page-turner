@@ -175,8 +175,8 @@ void hid_task(void *pvParameters)
 
 void control_task(void *pvParameters)
 {
-    TickType_t onDelay = 2500 / portTICK_PERIOD_MS;
-    TickType_t offDelay = 1000 / portTICK_PERIOD_MS;
+    TickType_t onDelay = 100 / portTICK_PERIOD_MS;
+    TickType_t offDelay = 100 / portTICK_PERIOD_MS;
     for(;;) {
         if (turn_the_page) {
             ESP_LOGI(TAG, "ON!");
