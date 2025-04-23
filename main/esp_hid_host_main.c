@@ -66,52 +66,6 @@ void hid_callback(void *handler_args, esp_event_base_t base, int32_t id, void *e
         ESP_LOGI(TAG, "NOTIFICATION!");
     }
     return;
-
-
-    // esp_hidh_event_t event = (esp_hidh_event_t)id;
-    // esp_hidh_event_data_t *param = (esp_hidh_event_data_t *)event_data;
-
-    // switch (event) {
-    // case ESP_HIDH_OPEN_EVENT: {
-    //     if (param->open.status == ESP_OK) {
-    //         const uint8_t *bda = esp_hidh_dev_bda_get(param->open.dev);
-    //         ESP_LOGI(TAG, ESP_BD_ADDR_STR " OPEN: %s", ESP_BD_ADDR_HEX(bda), esp_hidh_dev_name_get(param->open.dev));
-    //         esp_hidh_dev_dump(param->open.dev, stdout);
-    //     } else {
-    //         ESP_LOGE(TAG, " OPEN failed!");
-    //     }
-    //     break;
-    // }
-    // case ESP_HIDH_BATTERY_EVENT: {
-    //     const uint8_t *bda = esp_hidh_dev_bda_get(param->battery.dev);
-    //     ESP_LOGI(TAG, ESP_BD_ADDR_STR " BATTERY: %d%%", ESP_BD_ADDR_HEX(bda), param->battery.level);
-    //     break;
-    // }
-    // case ESP_HIDH_INPUT_EVENT: {
-    //     const uint8_t *bda = esp_hidh_dev_bda_get(param->input.dev);
-    //     ESP_LOGI(TAG, ESP_BD_ADDR_STR " INPUT: %8s, MAP: %2u, ID: %3u, Len: %d, Data:", ESP_BD_ADDR_HEX(bda), esp_hid_usage_str(param->input.usage), param->input.map_index, param->input.report_id, param->input.length);
-    //     ESP_LOG_BUFFER_HEX(TAG, param->input.data, param->input.length);
-    //     turn_the_page = 1;
-    //     ESP_LOGI(TAG, "NOTIFICATION!");
-    //     break;
-    // }
-    // case ESP_HIDH_FEATURE_EVENT: {
-    //     const uint8_t *bda = esp_hidh_dev_bda_get(param->feature.dev);
-    //     ESP_LOGI(TAG, ESP_BD_ADDR_STR " FEATURE: %8s, MAP: %2u, ID: %3u, Len: %d", ESP_BD_ADDR_HEX(bda),
-    //              esp_hid_usage_str(param->feature.usage), param->feature.map_index, param->feature.report_id,
-    //              param->feature.length);
-    //     ESP_LOG_BUFFER_HEX(TAG, param->feature.data, param->feature.length);
-    //     break;
-    // }
-    // case ESP_HIDH_CLOSE_EVENT: {
-    //     const uint8_t *bda = esp_hidh_dev_bda_get(param->close.dev);
-    //     ESP_LOGI(TAG, ESP_BD_ADDR_STR " CLOSE: %s", ESP_BD_ADDR_HEX(bda), esp_hidh_dev_name_get(param->close.dev));
-    //     break;
-    // }
-    // default:
-    //     ESP_LOGI(TAG, "EVENT: %d", event);
-    //     break;
-    // }
 }
 
 #define SCAN_DURATION_SECONDS 5
@@ -138,13 +92,7 @@ void loop()
                 printf("ADDR_TYPE: '%s', ", ble_addr_type_str(r->ble.addr_type));
             }
 #endif /* CONFIG_BT_BLE_ENABLED */
-// #if CONFIG_BT_NIMBLE_ENABLED
-//             if (r->transport == ESP_HID_TRANSPORT_BLE) {
-//                 cr = r;
-//                 printf("APPEARANCE: 0x%04x, ", r->ble.appearance);
-//                 printf("ADDR_TYPE: '%d', ", r->ble.addr_type);
-//             }
-// #endif /* CONFIG_BT_BLE_ENABLED */
+
 #if CONFIG_BT_HID_HOST_ENABLED
             if (r->transport == ESP_HID_TRANSPORT_BT) {
                 cr = r;
@@ -228,40 +176,10 @@ void app_main(void)
     };
     ESP_ERROR_CHECK( esp_hidh_init(&config) );
 
-// #if CONFIG_BT_NIMBLE_ENABLED
-//     /* XXX Need to have template for store */
-//     ble_store_config_init();
-
-//     ble_hs_cfg.store_status_cb = ble_store_util_status_rr;
-// 	/* Starting nimble task after gatts is initialized*/
-//     ret = esp_nimble_enable(ble_hid_host_task);
-//     if (ret) {
-//         ESP_LOGE(TAG, "esp_nimble_enable failed: %d", ret);
-//     }
-// #endif
-
     gpio_reset_pin(LED);
     gpio_set_direction(LED, GPIO_MODE_OUTPUT);
     gpio_set_level(LED, 0);
 
    xTaskCreate(&hid_task, "hid_task", 6 * 1024, NULL, 2, NULL);
    xTaskCreate(&control_task, "control_task", 6 * 1024, NULL, tskIDLE_PRIORITY, NULL);
-
-    // TickType_t onDelay = 3000 / portTICK_PERIOD_MS;
-    // TickType_t offDelay = 3000 / portTICK_PERIOD_MS;
-    // for(;;) {
-    //     // if (turn_the_page) {
-    //         ESP_LOGI(TAG, "ON!");
-    //         gpio_set_level(LED, 1);
-    //         vTaskDelay(onDelay);
-
-    //         // turn_the_page = 0;
-    //         ESP_LOGI(TAG, "OFF!");
-    //         gpio_set_level(LED, 0);
-    //         vTaskDelay(offDelay);
-    //         // turn_the_page = 0;
-    //     // }
-    // }
-
-//    vTaskStartScheduler();
 }
